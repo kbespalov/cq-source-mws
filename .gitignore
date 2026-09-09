@@ -1,0 +1,23 @@
+# Reference clones, not part of this module
+/cq-source-yc/
+/terraform-provider-mws/
+
+# Build artifacts
+/cq-source-mws
+/dist/
+/build/
+/.cq/
+*.test
+
+# Local sync output
+/test/output/
+
+# Editor / agent state — local plans and Cursor metadata stay off the remote
+.cursor/
+/.cursor/
+
+# Working design notes, not part of the published tree
+/PLAN.md
+
+# CLI logs
+cloudquery.log

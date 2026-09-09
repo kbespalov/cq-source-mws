@@ -1,0 +1,23 @@
+kind: source
+spec:
+  name: mws
+  registry: local
+  # Paths are resolved from the working directory, so run this from the repo
+  # root: go build -o cq-source-mws . && cloudquery sync test/config.yaml
+  path: ./cq-source-mws
+  tables:
+    - "*"
+  destinations:
+    - sqlite
+  spec:
+    concurrency: 10
+---
+kind: destination
+spec:
+  name: sqlite
+  # Built from source (MPL-2.0) by `make destination`, so a sync needs no
+  # CloudQuery Hub account. See README for the hub alternative.
+  registry: local
+  path: ./dist/cq-destination-sqlite
+  spec:
+    connection_string: ./test/output/mws.db
