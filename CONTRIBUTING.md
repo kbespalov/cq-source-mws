@@ -19,6 +19,10 @@ key, a multiplexer (top-level only) and a unique `mws_` name.
 `TestSyncProjects` talks to a live installation and is skipped unless
 `MWS_TOKEN` or `MWS_SERVICE_ACCOUNT_AUTHORIZED_KEY_PATH` is set.
 
+CI on GitHub Actions runs `make test`, `make lint`, `make tidy` and
+`make vuln` on every pull request. A tag `v*` builds the binaries and
+attaches them to a GitHub release.
+
 ## Adding a service
 
 1. Confirm the SDK has a `List*` method. A `Get*` alone is not a table.

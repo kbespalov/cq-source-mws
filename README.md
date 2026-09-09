@@ -1,5 +1,8 @@
 # CloudQuery source for MWS Cloud Platform
 
+[![CI](https://github.com/kbespalov/cq-source-mws/actions/workflows/ci.yml/badge.svg)](https://github.com/kbespalov/cq-source-mws/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/kbespalov/cq-source-mws/actions/workflows/codeql.yml/badge.svg)](https://github.com/kbespalov/cq-source-mws/actions/workflows/codeql.yml)
+
 A [CloudQuery](https://www.cloudquery.io/) source plugin for the [MWS Cloud Platform](https://mws.ru/cloud-platform/). It lists the resources a set of credentials can see and writes them to any CloudQuery destination — PostgreSQL, SQLite, S3, and the rest of the [destination catalog](https://hub.cloudquery.io/plugins/destination).
 
 Auth is the same as the MWS CLI and Terraform provider: an IAM token or a service-account key. The plugin discovers the organization / folder / project tree from the project list, then walks every selected project. A service that was never enabled in a project is skipped, not treated as a failed sync.
@@ -52,10 +55,13 @@ The MWS Go SDK needs Go 1.26 or newer. The toolchain is pulled in automatically.
 
 ```sh
 make build          # ./cq-source-mws
-make test           # go test ./...
+make test           # go test -race ./...
+make lint           # golangci-lint
 make destination    # local SQLite destination, no CloudQuery Hub account
 make sync           # needs MWS credentials; writes test/output/mws.db
 ```
+
+Pull requests and pushes to `main` run lint, tests, `go mod tidy`, govulncheck, and a build. A tag `v*` publishes binaries on the GitHub release. Dependabot opens a weekly PR for Go modules and Actions.
 
 If `go build` cannot download the 1.26 toolchain (a corporate proxy is the usual reason):
 

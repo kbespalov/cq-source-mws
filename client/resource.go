@@ -126,7 +126,7 @@ func flatten(t reflect.Type, namePrefix, path string, depth int) ([]schema.Colum
 		}
 
 		prefix := namePrefix
-		if !field.Anonymous && !(depth == 0 && field.Name == metadataField) {
+		if !field.Anonymous && (depth != 0 || field.Name != metadataField) {
 			name, err := transformers.DefaultNameTransformer(field)
 			if err != nil {
 				return nil, err

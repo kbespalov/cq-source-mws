@@ -359,7 +359,7 @@ func arrowType(t *testing.T, model any, column string) arrow.DataType {
 }
 
 // record builds the Arrow record a sync would emit for one resource.
-func record(t *testing.T, model any, payload string) arrow.Record {
+func record(t *testing.T, model any, payload string) arrow.RecordBatch {
 	t.Helper()
 
 	if err := json.Unmarshal([]byte(payload), model); err != nil {
@@ -382,10 +382,10 @@ func record(t *testing.T, model any, payload string) arrow.Record {
 	for i, value := range resource.GetValues() {
 		scalar.AppendToBuilder(builder.Field(i), value)
 	}
-	return builder.NewRecord()
+	return builder.NewRecordBatch()
 }
 
-func columnValue(t *testing.T, rec arrow.Record, column string) string {
+func columnValue(t *testing.T, rec arrow.RecordBatch, column string) string {
 	t.Helper()
 
 	indices := rec.Schema().FieldIndices(column)

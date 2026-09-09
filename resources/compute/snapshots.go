@@ -11,13 +11,15 @@ import (
 	"cq-source-mws/client"
 )
 
+// Snapshots lists compute snapshots. The SDK prefers DiskBackup; this table
+// stays while the snapshots API still answers.
 func Snapshots() *schema.Table {
 	return &schema.Table{
 		Name:        "mws_compute_snapshots",
 		Description: "Disk snapshots of every synced project",
 		Resolver:    fetchSnapshots,
 		Multiplex:   client.ProjectMultiplex(),
-		Transform:   client.TransformResource(&computemodel.SnapshotOptionalResponse{}),
+		Transform:   client.TransformResource(&computemodel.SnapshotOptionalResponse{}), //nolint:staticcheck
 		Columns:     client.ProjectHierarchyColumns(),
 	}
 }
@@ -31,5 +33,5 @@ func fetchSnapshots(ctx context.Context, meta schema.ClientMeta, _ *schema.Resou
 	}
 
 	req := computeclient.ListSnapshotsRequest{Project: c.ProjectName}
-	return client.List(ctx, req, snapshots.ListSnapshots, res, c.Skip(serviceName))
+	return client.List(ctx, req, snapshots.ListSnapshots, res, c.Skip(serviceName)) //nolint:staticcheck
 }
