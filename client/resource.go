@@ -173,6 +173,21 @@ func opaque(dataType arrow.DataType) bool {
 	return dataType == nil || arrow.TypeEqual(dataType, cqtypes.ExtensionTypes.JSON)
 }
 
+// modelJSON reports whether a JSON column holds a model (a slice of structs,
+// a leftover nested object) rather than a document the API did not describe.
+func modelJSON(t reflect.Type, dataType arrow.DataType) bool {
+	if !arrow.TypeEqual(dataType, cqtypes.ExtensionTypes.JSON) {
+		return false
+	}
+	for t.Kind() == reflect.Pointer {
+		t = t.Elem()
+	}
+	if t.Kind() == reflect.Slice && t.Elem().Kind() == reflect.Uint8 && rawJSON(t) {
+		return false
+	}
+	return true
+}
+
 func column(field reflect.StructField, dataType arrow.DataType, namePrefix, path string) (*schema.Column, error) {
 	if dataType == nil {
 		return nil, nil // the SDK ignores this field, so do we
@@ -189,7 +204,16 @@ func column(field reflect.StructField, dataType arrow.DataType, namePrefix, path
 	fieldPath := path + field.Name
 	resolver := ResolverTransformer(field, fieldPath)
 	if resolver == nil {
-		resolver = transformers.DefaultResolverTransformer(field, fieldPath)
+		// A slice of structs (NICs, attached disks) stays JSON. The SDK
+		// marshals nested *Ref values as Path(), which is relative; the
+		// walk below stores IDPath() so those blobs join the same way
+		// scalar ref columns do. A raw document the model does not
+		// describe is left as the server wrote it.
+		if modelJSON(field.Type, dataType) {
+			resolver = resolveValue(fieldPath, jsonAbsoluteRefsValue)
+		} else {
+			resolver = transformers.DefaultResolverTransformer(field, fieldPath)
+		}
 	}
 
 	return &schema.Column{

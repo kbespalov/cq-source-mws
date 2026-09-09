@@ -16,18 +16,23 @@ import (
 // two ways: as a field of the resource, and as an element of a slice, where
 // there is no path to read from. Both need the identical treatment, or a list
 // of addresses would end up spelled differently from an address of its own.
-type converter func(data any) (any, error)
+// The client is the multiplexed one for this row and may be nil in tests.
+type converter func(ctx context.Context, c *Client, data any) (any, error)
 
 // resolveValue reads the field at path and stores what the converter makes of
 // it. Paths are dotted and read with funk.Get, which yields nil for anything
 // missing on the way, so an absent field leaves the column null.
 func resolveValue(path string, value converter) schema.ColumnResolver {
-	return func(_ context.Context, _ schema.ClientMeta, resource *schema.Resource, c schema.Column) error {
+	return func(ctx context.Context, meta schema.ClientMeta, resource *schema.Resource, c schema.Column) error {
 		data := funk.Get(resource.Item, path)
 		if data == nil {
 			return nil
 		}
-		converted, err := value(data)
+		var client *Client
+		if meta != nil {
+			client, _ = meta.(*Client)
+		}
+		converted, err := value(ctx, client, data)
 		if err != nil {
 			return fmt.Errorf("column %q: %w", c.Name, err)
 		}
@@ -40,7 +45,7 @@ func resolveValue(path string, value converter) schema.ColumnResolver {
 
 // resourceIDValue is the full resource path of an AnyResourceID or a typed
 // *ID, e.g. "rm/projects/my-project".
-func resourceIDValue(data any) (any, error) {
+func resourceIDValue(_ context.Context, _ *Client, data any) (any, error) {
 	id, ok := addr(data).(resourceID)
 	if !ok {
 		return nil, fmt.Errorf("wanted a resource id, have %T", data)
@@ -56,29 +61,31 @@ func resourceIDValue(data any) (any, error) {
 // "org/organizations/my-org" from one field and "organizations/my-org" from
 // another, purely depending on the caller's context. IDPath() normalises that
 // to the absolute, service-qualified form, which is the only one that joins
-// across tables. Path() remains the fallback for a relative reference that was
-// never resolved, where IDPath() has nothing to build an absolute path from.
-func refValue(data any) (any, error) {
+// across tables. A name-only reference can still be completed from the
+// multiplex project; see absoluteRef. Path() remains the fallback when the
+// SDK has nothing to build an absolute path from.
+func refValue(ctx context.Context, c *Client, data any) (any, error) {
 	ref, ok := addr(data).(resourceRef)
 	if !ok {
 		return nil, fmt.Errorf("wanted a resource reference, have %T", data)
 	}
-	return RefPath(ref), nil
+	path := absoluteRef(ctx, c, ref)
+	if path == "" {
+		return nil, nil
+	}
+	return path, nil
 }
 
 // RefPath returns the absolute path of a reference, falling back to the
 // original one when the reference is relative and unresolved.
 func RefPath(ref resourceRef) string {
-	if absolute := ref.IDPath(); absolute != "" {
-		return absolute
-	}
-	return ref.Path()
+	return absoluteRef(context.Background(), nil, ref)
 }
 
 // quantityValue is the amount a unit type holds, in the base unit of its
 // dimension: bytes for a size, hertz for a frequency. The unit the API wrote
 // it in is lost, which is the point: only one scale can be summed.
-func quantityValue(data any) (any, error) {
+func quantityValue(_ context.Context, _ *Client, data any) (any, error) {
 	amount, ok := addr(data).(quantity)
 	if !ok {
 		return nil, fmt.Errorf("wanted a quantity, have %T", data)
@@ -99,19 +106,19 @@ func quantityValue(data any) (any, error) {
 // to its four-byte form on the way. Passing the net.IP out of the model would
 // skip that step: net.ParseIP keeps every address 16 bytes wide, so 10.0.0.1
 // would be stored as ::ffff:10.0.0.1/128.
-func inetValue(data any) (any, error) {
+func inetValue(ctx context.Context, c *Client, data any) (any, error) {
 	value := addr(data)
 	_, cidr := value.(cidrAddress)
 	_, ip := value.(ipAddress)
 	if !cidr && !ip {
 		return nil, fmt.Errorf("wanted an address, have %T", data)
 	}
-	return stringerValue(data)
+	return stringerValue(ctx, c, data)
 }
 
 // stringerValue is the rendering of a type that keeps its state unexported,
 // such as a duration written back as "PT30S".
-func stringerValue(data any) (any, error) {
+func stringerValue(_ context.Context, _ *Client, data any) (any, error) {
 	s, ok := addr(data).(fmt.Stringer)
 	if !ok {
 		return nil, fmt.Errorf("wanted a fmt.Stringer, have %T", data)
@@ -126,7 +133,7 @@ func stringerValue(data any) (any, error) {
 // optionalValue unwraps optional.Optional[T] and optional.OptionalNil[T],
 // leaving the column null when the field was not set.
 func optionalValue(inner converter) converter {
-	return func(data any) (any, error) {
+	return func(ctx context.Context, c *Client, data any) (any, error) {
 		v := reflect.Indirect(reflect.ValueOf(data))
 		if set := v.FieldByName("Set"); set.IsValid() && !set.Bool() {
 			return nil, nil
@@ -144,14 +151,14 @@ func optionalValue(inner converter) converter {
 		if inner == nil {
 			return value.Interface(), nil
 		}
-		return inner(value.Interface())
+		return inner(ctx, c, value.Interface())
 	}
 }
 
 // sliceValue converts a slice element by element, so that a list column holds
 // the same values a column of one element would.
 func sliceValue(elem converter) converter {
-	return func(data any) (any, error) {
+	return func(ctx context.Context, c *Client, data any) (any, error) {
 		v := reflect.Indirect(reflect.ValueOf(data))
 		if v.Kind() != reflect.Slice {
 			return nil, fmt.Errorf("wanted a slice, have %T", data)
@@ -161,7 +168,7 @@ func sliceValue(elem converter) converter {
 		}
 		values := make([]any, v.Len())
 		for i := range values {
-			converted, err := elem(v.Index(i).Interface())
+			converted, err := elem(ctx, c, v.Index(i).Interface())
 			if err != nil {
 				return nil, fmt.Errorf("element %d: %w", i, err)
 			}
@@ -183,12 +190,12 @@ func ResolveResourceName(path string) schema.ColumnResolver {
 // service writes metadata.id as a resource id, which parses itself; regions
 // and zones write theirs as a reference instead, and there the name is the
 // last segment of the path.
-func resourceNameValue(data any) (any, error) {
+func resourceNameValue(ctx context.Context, c *Client, data any) (any, error) {
 	switch value := addr(data).(type) {
 	case resourceID:
 		return string(value.ResourceName()), nil
 	case resourceRef:
-		return lastSegment(RefPath(value)), nil
+		return lastSegment(absoluteRef(ctx, c, value)), nil
 	}
 	return nil, fmt.Errorf("wanted a resource id or reference, have %T", data)
 }
