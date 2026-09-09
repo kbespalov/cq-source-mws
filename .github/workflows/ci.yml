@@ -24,6 +24,7 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
+          check-latest: true
           cache: true
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v9
@@ -39,6 +40,7 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
+          check-latest: true
           cache: true
       - name: Test
         run: make test
@@ -52,6 +54,7 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
+          check-latest: true
           cache: true
       - name: Check go.mod is tidy
         run: make tidy
@@ -65,6 +68,7 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
+          check-latest: true
           cache: true
       - name: govulncheck
         run: make vuln
@@ -78,6 +82,7 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
+          check-latest: true
           cache: true
       - name: Build
         run: make build
