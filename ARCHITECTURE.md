@@ -24,6 +24,15 @@ wrappers onto Arrow types. Slices of structs stay JSON: that is where a child
 table belongs, not a column. Fields the SDK marks as secrets
 (`sensitive.Sensitive`, detected via `slog.LogValuer`) get no column at all.
 
+References and identifiers are stored as the SDK's absolute path
+(`IDPath()` / `ID()`): `vpc/projects/my-project/networks/net-1/addresses/addr-1`,
+never the relative `Path()` the server may have written. That applies to
+scalar `*_ref` columns and to refs nested inside JSON, so a NIC blob joins
+`mws_vpc_addresses.id`. A name-only ref is completed from the project the
+row was multiplexed for when the SDK can fill the rest; otherwise the wire
+value is kept. Plain strings that happen to look like paths (for example
+`usages.resource`) are left as the API sent them.
+
 ## Hierarchy
 
 MWS has no public list API for organizations or folders. Every project reports

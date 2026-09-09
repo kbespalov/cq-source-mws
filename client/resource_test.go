@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"encoding/json"
+	"strings"
 	"testing"
 
 	"github.com/apache/arrow-go/v18/arrow"
@@ -25,6 +26,11 @@ import (
 // not exercised here.
 func resolve(t *testing.T, model any, payload string) map[string]string {
 	t.Helper()
+	return resolveMeta(t, nil, model, payload)
+}
+
+func resolveMeta(t *testing.T, meta schema.ClientMeta, model any, payload string) map[string]string {
+	t.Helper()
 
 	if err := json.Unmarshal([]byte(payload), model); err != nil {
 		t.Fatalf("unmarshal fixture: %v", err)
@@ -38,7 +44,7 @@ func resolve(t *testing.T, model any, payload string) map[string]string {
 	resource := schema.NewResourceData(table, nil, model)
 	values := make(map[string]string, len(table.Columns))
 	for _, col := range table.Columns {
-		if err := col.Resolver(context.Background(), nil, resource, col); err != nil {
+		if err := col.Resolver(context.Background(), meta, resource, col); err != nil {
 			t.Fatalf("resolve %q: %v", col.Name, err)
 		}
 		values[col.Name] = resource.Get(col.Name).String()
@@ -90,6 +96,72 @@ func TestReferencesAreAbsolute(t *testing.T) {
 			t.Errorf("column %q: got %q, want %q", column, got, want)
 		}
 	}
+
+	// A NIC list stays JSON. The server writes relative refs; the column
+	// stores the same absolute paths the address and NAT tables use as id.
+	t.Run("json nics", func(t *testing.T) {
+		const vm = `{
+		  "kind": "VirtualMachine",
+		  "metadata": {"id": "compute/projects/my-project/virtualMachines/vm-1"},
+		  "spec": {"zone": "ru-central-1a"},
+		  "status": {
+		    "network": {
+		      "networkInterfaces": [{
+		        "name": "nic0",
+		        "addresses": [{
+		          "subnet": "projects/my-project/networks/net-1/subnets/subnet-1",
+		          "network": "projects/my-project/networks/net-1",
+		          "ref": "projects/my-project/networks/net-1/addresses/addr-1",
+		          "ipAddress": "10.0.0.5",
+		          "oneToOneNat": {
+		            "ref": "projects/my-project/networks/net-1/oneToOneNats/nat-1",
+		            "external": {
+		              "ref": "projects/my-project/externalAddresses/ext-1",
+		              "ipAddress": "203.0.113.10"
+		            }
+		          }
+		        }]
+		      }]
+		    }
+		  }
+		}`
+
+		rec := record(t, &computemodel.VirtualMachineOptionalResponse{}, vm)
+		got := columnValue(t, rec, "status_network_network_interfaces")
+		for _, want := range []string{
+			"vpc/projects/my-project/networks/net-1/addresses/addr-1",
+			"vpc/projects/my-project/networks/net-1/subnets/subnet-1",
+			"vpc/projects/my-project/networks/net-1",
+			"vpc/projects/my-project/networks/net-1/oneToOneNats/nat-1",
+			"vpc/projects/my-project/externalAddresses/ext-1",
+		} {
+			if !strings.Contains(got, want) {
+				t.Errorf("NIC JSON missing %q\n%s", want, got)
+			}
+		}
+		if strings.Contains(got, `"ref":"projects/`) {
+			t.Errorf("NIC JSON still has a relative ref\n%s", got)
+		}
+	})
+
+	// A disk named only as "disk-1" is completed from the multiplex project.
+	t.Run("short disk name", func(t *testing.T) {
+		const vm = `{
+		  "kind": "VirtualMachine",
+		  "metadata": {"id": "compute/projects/my-project/virtualMachines/vm-1"},
+		  "spec": {
+		    "zone": "ru-central-1a",
+		    "storage": {"disks": [{"disk": {"ref": "disk-1"}}]}
+		  },
+		  "status": {}
+		}`
+
+		rec := recordMeta(t, &Client{ProjectName: "my-project"}, &computemodel.VirtualMachineOptionalResponse{}, vm)
+		got := columnValue(t, rec, "spec_storage_disks")
+		if !strings.Contains(got, "compute/projects/my-project/disks/disk-1") {
+			t.Errorf("short disk name was not expanded\n%s", got)
+		}
+	})
 }
 
 // TestTimestamps covers time, which shows up in nearly every table.
@@ -361,6 +433,11 @@ func arrowType(t *testing.T, model any, column string) arrow.DataType {
 // record builds the Arrow record a sync would emit for one resource.
 func record(t *testing.T, model any, payload string) arrow.RecordBatch {
 	t.Helper()
+	return recordMeta(t, nil, model, payload)
+}
+
+func recordMeta(t *testing.T, meta schema.ClientMeta, model any, payload string) arrow.RecordBatch {
+	t.Helper()
 
 	if err := json.Unmarshal([]byte(payload), model); err != nil {
 		t.Fatalf("unmarshal fixture: %v", err)
@@ -373,7 +450,7 @@ func record(t *testing.T, model any, payload string) arrow.RecordBatch {
 
 	resource := schema.NewResourceData(table, nil, model)
 	for _, col := range table.Columns {
-		if err := col.Resolver(context.Background(), nil, resource, col); err != nil {
+		if err := col.Resolver(context.Background(), meta, resource, col); err != nil {
 			t.Fatalf("resolve %q: %v", col.Name, err)
 		}
 	}
