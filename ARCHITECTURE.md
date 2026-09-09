@@ -65,9 +65,15 @@ in the primary key.
 
 ## What this plugin does not cover
 
-Services that have a REST API but no Go SDK client yet: object storage, DNS,
-container registry, CDN, audit logs, queues. They share the same envelope and
-can reuse `TransformResource` once a lister exists.
+Services that have a REST API but no Go SDK client yet: object storage,
+private DNS, container registry, CDN, audit logs, queues. They share the
+same envelope and can reuse `TransformResource` once a lister exists.
+
+Organization and identity live above the project list: organizations,
+folders, federations, users, and access bindings on the organization /
+folder / project. Those IDs are inferred from projects; there is no
+public list API in the SDK. Billing accounts and monitoring metrics are
+the same kind of gap — a platform surface without a listable client.
 
 Endpoints that only `Get` a single object, or that perform an action
 (switchover, decrypt, issue a token), are not tables.

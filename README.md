@@ -124,4 +124,34 @@ Service names in the table link to the overview in [MWS Docs](https://mws.ru/doc
 | [MWS GPT](https://mws.ru/docs/cloud-platform/gpt/general/whatis-gpt.html) | Model | `mws_gpt_models` | ✅ |
 | [MWS GPT](https://mws.ru/docs/cloud-platform/gpt/general/whatis-gpt.html) | Deployment | `mws_gpt_deployments` | ✅ |
 
+### Not yet supported
+
+**Project services without a Go SDK client.** They have a REST API and share the same resource envelope as the tables above, so they can reuse `TransformResource` once a lister exists.
+
+| Service | Status |
+|---|:---:|
+| [Object Storage](https://mws.ru/docs/cloud-platform/storage/general/whatis-object-storage.html) | ❌ |
+| [Private DNS](https://mws.ru/docs/cloud-platform/vpc/general/vpc-private-dns-overview.html) | ❌ |
+| [Artifact Registry](https://mws.ru/docs/cloud-platform/registry/general/whatis-registry.html) | ❌ |
+| [CDN](https://mws.ru/docs/cloud-platform/cdn/general/whatis-cdn.html) | ❌ |
+| [Audit Logs](https://mws.ru/docs/cloud-platform/audit-logs/general/whatis-audit-logs.html) | ❌ |
+| Queues | ❌ |
+
+**Organization and identity.** There is no public list API in the Go SDK for the organization itself. The plugin reconstructs organization and folder IDs from the project list; empty folders, members, and federations are not synced. Role bindings exist only on KMS keys, secrets, and certificates — not on the organization, folder, or project.
+
+| Service | Resource | Status |
+|---|---|:---:|
+| [Resource Manager](https://mws.ru/docs/cloud-platform/org-rm/general/whatis-rm.html) | [Organization](https://mws.ru/docs/cloud-platform/org-rm/general/whatis-organization.html) | ❌ |
+| [Resource Manager](https://mws.ru/docs/cloud-platform/org-rm/general/whatis-rm.html) | [Folder](https://mws.ru/docs/cloud-platform/org-rm/general/folder-overview.html) | ❌ |
+| [Resource Manager](https://mws.ru/docs/cloud-platform/org-rm/general/whatis-rm.html) | [Federation](https://mws.ru/docs/cloud-platform/org-rm/general/federation-overview.html) | ❌ |
+| [Resource Manager](https://mws.ru/docs/cloud-platform/org-rm/general/whatis-rm.html) | [User](https://mws.ru/docs/cloud-platform/org-rm/general/user-in-org-operations.html) | ❌ |
+| [IAM](https://mws.ru/docs/cloud-platform/iam/general/whatis-iam.html) | Access binding (organization / folder / project) | ❌ |
+
+**Billing and other platform surfaces.** These are not listable inventory in the Go SDK.
+
+| Service | Status |
+|---|:---:|
+| [Billing](https://mws.ru/docs/cloud-platform/billing/general/whatis-billing.html) | ❌ |
+| [Monitoring](https://mws.ru/docs/cloud-platform/monitoring/general/whatis-monitoring.html) | ❌ |
+
 See [ARCHITECTURE.md](ARCHITECTURE.md) for how models become columns and how the project hierarchy is discovered.
