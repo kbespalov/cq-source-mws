@@ -7,7 +7,7 @@ require (
 	github.com/cloudquery/plugin-sdk/v4 v4.96.3
 	github.com/rs/zerolog v1.35.1
 	github.com/thoas/go-funk v0.9.3
-	go.mws.cloud/go-sdk v0.20.0
+	go.mws.cloud/go-sdk v0.21.0
 	google.golang.org/grpc v1.83.2
 )
 
