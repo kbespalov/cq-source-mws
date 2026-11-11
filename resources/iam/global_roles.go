@@ -37,6 +37,6 @@ func fetchGlobalRoles(ctx context.Context, meta schema.ClientMeta, _ *schema.Res
 	// grant; backoffice is the operator's own, and a row from it would be
 	// indistinguishable here from a role anyone could use.
 	roleType := "public"
-	req := iamclient.ListGlobalRoleV2Request{Type: &roleType}
+	req := iamclient.ListGlobalRoleV2Request{Type: roleType}
 	return client.List(ctx, req, roles.ListGlobalRoleV2, res, nil)
 }

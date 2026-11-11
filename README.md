@@ -78,6 +78,7 @@ Service names in the table link to the overview in [MWS Docs](https://mws.ru/doc
 | Service | Resource | Table | Status |
 |---|---|---|:---:|
 | [Resource Manager](https://mws.ru/docs/cloud-platform/org-rm/general/whatis-rm.html) | [Project](https://mws.ru/docs/cloud-platform/org-rm/general/project-overview.html) | `mws_resmanager_projects` | ✅ |
+| [Resource Manager](https://mws.ru/docs/cloud-platform/org-rm/general/whatis-rm.html) | Role binding | `mws_resmanager_project_role_bindings` | ✅ |
 | [Resource Manager](https://mws.ru/docs/cloud-platform/org-rm/general/whatis-rm.html) | Enabled service | `mws_resmanager_enabled_services` | ✅ |
 | [Resource Manager](https://mws.ru/docs/cloud-platform/org-rm/general/whatis-rm.html) | Region | `mws_resmanager_regions` | ✅ |
 | [Resource Manager](https://mws.ru/docs/cloud-platform/org-rm/general/whatis-rm.html) | Zone | `mws_resmanager_zones` | ✅ |
@@ -98,11 +99,13 @@ Service names in the table link to the overview in [MWS Docs](https://mws.ru/doc
 | [VPC](https://mws.ru/docs/cloud-platform/vpc/general/whatis-vpc.html) | One-to-one NAT | `mws_vpc_one_to_one_nats` | ✅ |
 | [VPC](https://mws.ru/docs/cloud-platform/vpc/general/whatis-vpc.html) | NAT gateway | `mws_vpc_nat_gateways` | ✅ |
 | [VPC](https://mws.ru/docs/cloud-platform/vpc/general/whatis-vpc.html) | External address | `mws_vpc_external_addresses` | ✅ |
+| [VPC](https://mws.ru/docs/cloud-platform/vpc/general/whatis-vpc.html) | Service endpoint | `mws_vpc_service_endpoints` | ✅ |
 | [Network Load Balancer](https://mws.ru/docs/cloud-platform/nlb/general/whatis-nlb.html) | Load balancer | `mws_nlb_load_balancers` | ✅ |
 | [Managed PostgreSQL](https://mws.ru/docs/cloud-platform/mpostgres/general/whatis-mpostgres.html) | Cluster | `mws_mpostgres_clusters` | ✅ |
 | [Managed PostgreSQL](https://mws.ru/docs/cloud-platform/mpostgres/general/whatis-mpostgres.html) | Cluster user | `mws_mpostgres_cluster_users` | ✅ |
 | [Managed PostgreSQL](https://mws.ru/docs/cloud-platform/mpostgres/general/whatis-mpostgres.html) | Cluster database | `mws_mpostgres_cluster_databases` | ✅ |
 | [Managed PostgreSQL](https://mws.ru/docs/cloud-platform/mpostgres/general/whatis-mpostgres.html) | Backup | `mws_mpostgres_backups` | ✅ |
+| [Managed PostgreSQL](https://mws.ru/docs/cloud-platform/mpostgres/general/whatis-mpostgres.html) | Cluster role binding | `mws_mpostgres_cluster_role_bindings` | ✅ |
 | [Managed ClickHouse](https://mws.ru/docs/cloud-platform/mclickhouse/general/whatis-mclickhouse.html) | Cluster | `mws_mclickhouse_clusters` | ✅ |
 | [Managed ClickHouse](https://mws.ru/docs/cloud-platform/mclickhouse/general/whatis-mclickhouse.html) | Cluster user | `mws_mclickhouse_cluster_users` | ✅ |
 | [Managed ClickHouse](https://mws.ru/docs/cloud-platform/mclickhouse/general/whatis-mclickhouse.html) | Backup | `mws_mclickhouse_backups` | ✅ |
@@ -110,6 +113,8 @@ Service names in the table link to the overview in [MWS Docs](https://mws.ru/doc
 | [Managed Kafka](https://mws.ru/docs/cloud-platform/mkafka/general/whatis-mkafka.html) | Topic | `mws_mkafka_topics` | ✅ |
 | [Managed Kafka](https://mws.ru/docs/cloud-platform/mkafka/general/whatis-mkafka.html) | User | `mws_mkafka_users` | ✅ |
 | [Managed Kafka](https://mws.ru/docs/cloud-platform/mkafka/general/whatis-mkafka.html) | Connector | `mws_mkafka_connectors` | ✅ |
+| [Managed Kafka](https://mws.ru/docs/cloud-platform/mkafka/general/whatis-mkafka.html) | Version | `mws_mkafka_versions` | ✅ |
+| [Managed Kafka](https://mws.ru/docs/cloud-platform/mkafka/general/whatis-mkafka.html) | VM type | `mws_mkafka_vm_types` | ✅ |
 | [Managed Kubernetes](https://mws.ru/docs/cloud-platform/mk8s/general/whatis-mk8s.html) | Cluster | `mws_mk8s_clusters` | ✅ |
 | [Managed Kubernetes](https://mws.ru/docs/cloud-platform/mk8s/general/whatis-mk8s.html) | Node group | `mws_mk8s_node_groups` | ✅ |
 | [Managed Kubernetes](https://mws.ru/docs/cloud-platform/mk8s/general/whatis-mk8s.html) | Release channel | `mws_mk8s_release_channels` | ✅ |
@@ -129,6 +134,14 @@ Service names in the table link to the overview in [MWS Docs](https://mws.ru/doc
 | [Certificate Manager](https://mws.ru/docs/cloud-platform/certmanager/general/whatis-cert-manager.html) | Role binding | `mws_certmanager_certificate_role_bindings` | ✅ |
 | [MWS GPT](https://mws.ru/docs/cloud-platform/gpt/general/whatis-gpt.html) | Model | `mws_gpt_models` | ✅ |
 | [MWS GPT](https://mws.ru/docs/cloud-platform/gpt/general/whatis-gpt.html) | Deployment | `mws_gpt_deployments` | ✅ |
+| [Audit Logs](https://mws.ru/docs/cloud-platform/audit-logs/general/whatis-audit-logs.html) | Collector | `mws_auditlogs_collectors` | ✅ |
+| [Audit Logs](https://mws.ru/docs/cloud-platform/audit-logs/general/whatis-audit-logs.html) | Storage | `mws_auditlogs_storages` | ✅ |
+| [Queues](https://mws.ru/docs/cloud-platform/queue/general/whatis-queue.html) | Topic | `mws_queue_topics` | ✅ |
+| [Queues](https://mws.ru/docs/cloud-platform/queue/general/whatis-queue.html) | Topic partition | `mws_queue_topic_partitions` | ✅ |
+| [Queues](https://mws.ru/docs/cloud-platform/queue/general/whatis-queue.html) | Consumer group | `mws_queue_consumer_groups` | ✅ |
+| [Queues](https://mws.ru/docs/cloud-platform/queue/general/whatis-queue.html) | Topic role binding | `mws_queue_topic_role_bindings` | ✅ |
+| Metastore | Iceberg catalog | `mws_metastore_iceberg_catalogs` | ✅ |
+| Metastore | Iceberg role binding | `mws_metastore_iceberg_role_bindings` | ✅ |
 
 ### Not yet supported
 
@@ -140,10 +153,8 @@ Service names in the table link to the overview in [MWS Docs](https://mws.ru/doc
 | [Private DNS](https://mws.ru/docs/cloud-platform/vpc/general/vpc-private-dns-overview.html) | ❌ |
 | [Artifact Registry](https://mws.ru/docs/cloud-platform/registry/general/whatis-registry.html) | ❌ |
 | [CDN](https://mws.ru/docs/cloud-platform/cdn/general/whatis-cdn.html) | ❌ |
-| [Audit Logs](https://mws.ru/docs/cloud-platform/audit-logs/general/whatis-audit-logs.html) | ❌ |
-| Queues | ❌ |
 
-**Organization and identity.** There is no public list API in the Go SDK for the organization itself. The plugin reconstructs organization and folder IDs from the project list; empty folders, members, and federations are not synced. Role bindings exist only on KMS keys, secrets, and certificates — not on the organization, folder, or project.
+**Organization and identity.** There is no public list API in the Go SDK for the organization itself. The plugin reconstructs organization and folder IDs from the project list; empty folders, members, and federations are not synced. Role bindings exist on projects, KMS keys, secrets, certificates, PostgreSQL clusters, queue topics, and Iceberg catalogs — not on the organization, folder, or federation.
 
 | Service | Resource | Status |
 |---|---|:---:|

@@ -42,6 +42,7 @@ func Networks() *schema.Table {
 			AddressGroups(),
 			EgressNats(),
 			OneToOneNats(),
+			ServiceEndpoints(),
 		},
 	}
 }
