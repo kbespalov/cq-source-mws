@@ -4,16 +4,19 @@ import (
 	"github.com/cloudquery/plugin-sdk/v4/schema"
 	"github.com/cloudquery/plugin-sdk/v4/transformers"
 
+	"cq-source-mws/resources/auditlogs"
 	"cq-source-mws/resources/certmanager"
 	"cq-source-mws/resources/compute"
 	"cq-source-mws/resources/gpt"
 	"cq-source-mws/resources/iam"
 	"cq-source-mws/resources/kms"
 	"cq-source-mws/resources/mclickhouse"
+	"cq-source-mws/resources/metastore"
 	"cq-source-mws/resources/mk8s"
 	"cq-source-mws/resources/mkafka"
 	"cq-source-mws/resources/mpostgres"
 	"cq-source-mws/resources/nlb"
+	"cq-source-mws/resources/queue"
 	"cq-source-mws/resources/resmanager"
 	"cq-source-mws/resources/secretmanager"
 	"cq-source-mws/resources/vpc"
@@ -22,6 +25,7 @@ import (
 func tables() schema.Tables {
 	tables := schema.Tables{
 		resmanager.Projects(),
+		resmanager.ProjectRoleBindings(),
 		compute.VirtualMachines(),
 		compute.Disks(),
 		compute.Snapshots(),
@@ -36,6 +40,8 @@ func tables() schema.Tables {
 		mpostgres.Clusters(),
 		mclickhouse.Clusters(),
 		mkafka.Clusters(),
+		mkafka.Versions(),
+		mkafka.VmTypes(),
 		mk8s.Clusters(),
 		mk8s.ReleaseChannels(),
 		iam.ServiceAccounts(),
@@ -45,6 +51,12 @@ func tables() schema.Tables {
 		certmanager.Certificates(),
 		gpt.Models(),
 		gpt.Deployments(),
+		auditlogs.Collectors(),
+		auditlogs.Storages(),
+		queue.Topics(),
+		queue.ConsumerGroups(),
+		metastore.IcebergCatalogs(),
+		metastore.IcebergRoleBindings(),
 		resmanager.EnabledServices(),
 		resmanager.Regions(),
 		resmanager.Zones(),

@@ -68,15 +68,16 @@ Register it in `plugin/tables.go`. Nested listings take the parent name from
 `network_id`, `secret_id`, …). Listings without a page token use
 `client.Fetch` instead of `client.List`.
 
-A table whose model has no `metadata.id` — today only Kubernetes release
-channels and versions — spells its columns out by hand and puts `project_id`
-in the primary key.
+A table whose model has no `metadata.id` — Kubernetes release channels and
+versions, Kafka versions, queue topic partitions — spells its columns out
+by hand and puts `project_id` (and the parent, where there is one) in the
+primary key.
 
 ## What this plugin does not cover
 
 Services that have a REST API but no Go SDK client yet: object storage,
-private DNS, container registry, CDN, audit logs, queues. They share the
-same envelope and can reuse `TransformResource` once a lister exists.
+private DNS, container registry, CDN. They share the same envelope and can
+reuse `TransformResource` once a lister exists.
 
 Organization and identity live above the project list: organizations,
 folders, federations, users, and access bindings on the organization /
