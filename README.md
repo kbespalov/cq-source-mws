@@ -51,7 +51,7 @@ A user CLI profile that opens a browser will not work unattended. For CI and sch
 
 ## Build and test
 
-The MWS Go SDK needs Go 1.26 or newer. The toolchain is pulled in automatically.
+The MWS Go SDK needs Go 1.27 or newer. The toolchain is pulled in automatically.
 
 ```sh
 make build          # ./cq-source-mws
@@ -63,7 +63,7 @@ make sync           # needs MWS credentials; writes test/output/mws.db
 
 Pull requests and pushes to `main` run lint, tests, `go mod tidy`, govulncheck, and a build. A tag `v*` publishes binaries on the GitHub release. Dependabot opens a weekly PR for Go modules and Actions.
 
-If `go build` cannot download the 1.26 toolchain (a corporate proxy is the usual reason):
+If `go build` cannot download the 1.27 toolchain (a corporate proxy is the usual reason):
 
 ```sh
 GOPROXY=https://proxy.golang.org,direct GOSUMDB=sum.golang.org make build
@@ -109,6 +109,7 @@ Service names in the table link to the overview in [MWS Docs](https://mws.ru/doc
 | [Managed ClickHouse](https://mws.ru/docs/cloud-platform/mclickhouse/general/whatis-mclickhouse.html) | Cluster | `mws_mclickhouse_clusters` | ✅ |
 | [Managed ClickHouse](https://mws.ru/docs/cloud-platform/mclickhouse/general/whatis-mclickhouse.html) | Cluster user | `mws_mclickhouse_cluster_users` | ✅ |
 | [Managed ClickHouse](https://mws.ru/docs/cloud-platform/mclickhouse/general/whatis-mclickhouse.html) | Backup | `mws_mclickhouse_backups` | ✅ |
+| [Managed ClickHouse](https://mws.ru/docs/cloud-platform/mclickhouse/general/whatis-mclickhouse.html) | VM type | `mws_mclickhouse_vm_types` | ✅ |
 | [Managed Kafka](https://mws.ru/docs/cloud-platform/mkafka/general/whatis-mkafka.html) | Cluster | `mws_mkafka_clusters` | ✅ |
 | [Managed Kafka](https://mws.ru/docs/cloud-platform/mkafka/general/whatis-mkafka.html) | Topic | `mws_mkafka_topics` | ✅ |
 | [Managed Kafka](https://mws.ru/docs/cloud-platform/mkafka/general/whatis-mkafka.html) | User | `mws_mkafka_users` | ✅ |

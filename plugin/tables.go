@@ -39,6 +39,7 @@ func tables() schema.Tables {
 		nlb.LoadBalancers(),
 		mpostgres.Clusters(),
 		mclickhouse.Clusters(),
+		mclickhouse.VmTypes(),
 		mkafka.Clusters(),
 		mkafka.Versions(),
 		mkafka.VmTypes(),
