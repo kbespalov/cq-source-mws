@@ -1,5 +1,6 @@
 // Package mclickhouse holds the tables of the managed ClickHouse service: the
-// clusters of a project, their users and their backups.
+// clusters of a project, their users and their backups, plus the catalog of
+// virtual machine types a cluster can run on.
 package mclickhouse
 
 import (

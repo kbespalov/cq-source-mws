@@ -1,13 +1,13 @@
 module cq-source-mws
 
-go 1.26.11
+go 1.27.4
 
 require (
 	github.com/apache/arrow-go/v18 v18.8.0
 	github.com/cloudquery/plugin-sdk/v4 v4.96.4
 	github.com/rs/zerolog v1.35.1
 	github.com/thoas/go-funk v0.9.3
-	go.mws.cloud/go-sdk v0.29.0
+	go.mws.cloud/go-sdk v0.30.0
 	google.golang.org/grpc v1.84.0
 )
 
