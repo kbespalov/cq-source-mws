@@ -40,7 +40,7 @@ func NewResourceHierarchy(ctx context.Context, logger zerolog.Logger, sdk *mws.S
 
 	onlyAvailable := true
 	pager := page.NewPager(
-		rmclient.ListProjectsV3Request{OnlyAvailableProjects: &onlyAvailable},
+		WithPageSize(rmclient.ListProjectsV3Request{OnlyAvailableProjects: &onlyAvailable}),
 		projects.ListProjectsV3,
 	)
 
