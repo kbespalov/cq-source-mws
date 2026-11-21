@@ -1,5 +1,5 @@
 SQLITE_DESTINATION_VERSION ?= v2.14.9
-GOLANGCI_LINT_VERSION ?= v2.13.1
+GOLANGCI_LINT_VERSION ?= v2.15.0
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo development)
 LDFLAGS := -s -w -X cq-source-mws/plugin.Version=$(VERSION)
 
