@@ -46,7 +46,7 @@ func fetchProjects(ctx context.Context, meta schema.ClientMeta, _ *schema.Resour
 
 	onlyAvailable := true
 	pager := page.NewPager(
-		rmclient.ListProjectsV3Request{OnlyAvailableProjects: &onlyAvailable},
+		client.WithPageSize(rmclient.ListProjectsV3Request{OnlyAvailableProjects: &onlyAvailable}),
 		projects.ListProjectsV3,
 	)
 
